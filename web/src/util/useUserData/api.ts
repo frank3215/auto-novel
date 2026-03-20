@@ -8,6 +8,16 @@ export const AuthUrl = (() => {
     return `${protocol}//localhost:8000`;
   }
 
+  // 检查是否为 IP 地址 (任何以数字开头的 host 都视为 IP 地址)
+  // 支持: 192.168.1.100, 5.200, 10.0.0.5:3000 等格式
+  const hostWithoutPort = host.split(':')[0];
+  const isIpAddress = /^\d/.test(hostWithoutPort);
+
+  if (isIpAddress) {
+    // IP 地址直接使用当前 host，不添加 auth. 前缀
+    return `${protocol}//${host}`;
+  }
+
   // 不考虑 a.co.uk 这种顶级域名
   //  n.novelia.cc => auth.novelia.cc
   //  test.com => auth.test.com
