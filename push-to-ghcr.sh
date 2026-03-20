@@ -35,17 +35,17 @@ echo ""
 
 # 构建并推送 web 镜像
 echo "========================================="
-echo "构建并推送 web 镜像..."
+echo "构建并推送 web 镜像 (linux/amd64)..."
 echo "========================================="
-docker build -f web/Dockerfile -t "ghcr.io/$GITHUB_USERNAME/auto-novel-web:$IMAGE_TAG" .
+docker build --platform linux/amd64 -f web/Dockerfile -t "ghcr.io/$GITHUB_USERNAME/auto-novel-web:$IMAGE_TAG" .
 docker push "ghcr.io/$GITHUB_USERNAME/auto-novel-web:$IMAGE_TAG"
 echo ""
 
 # 构建并推送 server 镜像
 echo "========================================="
-echo "构建并推送 server 镜像..."
+echo "构建并推送 server 镜像 (linux/amd64)..."
 echo "========================================="
-docker build -t "ghcr.io/$GITHUB_USERNAME/auto-novel-server:$IMAGE_TAG" server
+docker build --platform linux/amd64 -t "ghcr.io/$GITHUB_USERNAME/auto-novel-server:$IMAGE_TAG" server
 docker push "ghcr.io/$GITHUB_USERNAME/auto-novel-server:$IMAGE_TAG"
 echo ""
 
