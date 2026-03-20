@@ -45,7 +45,7 @@ echo ""
 echo "========================================="
 echo "构建并推送 server 镜像..."
 echo "========================================="
-docker build -f server/Dockerfile -t "ghcr.io/$GITHUB_USERNAME/auto-novel-server:$IMAGE_TAG" .
+docker build -t "ghcr.io/$GITHUB_USERNAME/auto-novel-server:$IMAGE_TAG" server
 docker push "ghcr.io/$GITHUB_USERNAME/auto-novel-server:$IMAGE_TAG"
 echo ""
 
@@ -55,4 +55,5 @@ echo "Web 镜像: ghcr.io/$GITHUB_USERNAME/auto-novel-web:$IMAGE_TAG"
 echo "Server 镜像: ghcr.io/$GITHUB_USERNAME/auto-novel-server:$IMAGE_TAG"
 echo "========================================="
 echo ""
-echo "要使用这些镜像，修改 docker-compose.yml 中的 image 字段为上述地址。"
+echo "要使用这些镜像，使用 docker-compose.local.yml:"
+echo "  docker compose -f docker-compose.local.yml up -d"
