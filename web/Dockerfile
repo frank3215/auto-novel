@@ -12,6 +12,7 @@ FROM deps AS builder
 WORKDIR /app
 COPY packages/crawler ./packages/crawler
 COPY web ./web
+ENV VITE_API_MODE=local
 RUN pnpm run build
 
 FROM caddy:2.7.4
