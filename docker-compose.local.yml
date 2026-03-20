@@ -1,0 +1,82 @@
+# 本地 GHCR 镜像版本
+# 使用前将 YOUR_GITHUB_USERNAME 替换为你的 GitHub 用户名
+# 使用方法: docker compose -f docker-compose.local.yml up -d
+
+networks:
+  default:
+    name: auto-novel
+    driver: bridge
+
+services:
+  web:
+    image: ghcr.io/frank3215/auto-novel-web:local
+    ports:
+      - 80:80
+    volumes:
+      - ./data/files-temp:/data/files-temp
+      - ./data/files-wenku:/data/files-wenku
+      - ./data/files-extra:/data/files-extra
+    restart: always
+
+  api:
+    image: ghcr.io/frank3215/auto-novel-server:local
+    depends_on:
+      - mongo
+      - elasticsearch
+      - redis
+    environment:
+      - HTTPS_PROXY
+      - MAILGUN_API_KEY
+      - MAILGUN_API_URL
+      - MAILGUN_FROM_EMAIL
+      - ACCESS_TOKEN_SECRET
+      - HAMELN_TOKEN
+      - PIXIV_COOKIE_PHPSESSID
+      - DB_HOST_MONGO=mongo
+      - DB_HOST_ES=elasticsearch
+      - DB_HOST_REDIS=redis
+    volumes:
+      - ./data/files-temp:/data/files-temp
+      - ./data/files-wenku:/data/files-wenku
+      - ./data/files-extra:/data/files-extra
+    restart: always
+
+  mongo:
+    image: mongo:6.0.3
+    environment:
+      - MONGO_INITDB_DATABASE=main
+    volumes:
+      - ./db/mongo-init:/docker-entrypoint-initdb.d:ro
+      - ./data/db:/data/db
+    restart: always
+
+  elasticsearch:
+    image: elasticsearch:8.18.1
+    environment:
+      - xpack.security.enabled=false
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - ./data/es/data:/usr/share/elasticsearch/data
+      - ./data/es/plugins:/usr/share/elasticsearch/plugins
+    entrypoint: |
+      bash -c "
+      if ! elasticsearch-plugin list | grep -q analysis-icu; then
+        elasticsearch-plugin install analysis-icu
+      fi
+      /usr/local/bin/docker-entrypoint.sh eswrapper
+      "
+    restart: always
+
+  redis:
+    image: redis:7.2.1
+    restart: always
